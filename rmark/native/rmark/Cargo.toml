@@ -1,0 +1,15 @@
+[package]
+name = "rmark"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[lib]
+name = "rmark"
+path = "src/lib.rs"
+crate-type = ["dylib"]
+
+[dependencies]
+comrak = "0.7"
+lazy_static = "1.4"
+rustler = "0.21.0"
