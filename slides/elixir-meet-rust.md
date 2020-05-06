@@ -82,7 +82,7 @@ theme: uncover
 <!-- _backgroundColor: #222831 -->
 <!-- _color: #fff -->
 
-## 如何使用 rusler？
+## 如何使用 rustler？
 
 以 markdown -> html compiler 为例
 
