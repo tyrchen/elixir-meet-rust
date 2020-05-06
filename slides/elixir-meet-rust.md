@@ -24,6 +24,24 @@ theme: uncover
 
 ---
 
+
+![bg left](assets/about.jpg)
+
+## 关于我
+
+- 女儿奴
+- elixir, rust, flutter 爱好者
+- 懒散的码字农：
+  - [《途客圈创业记》](https://book.douban.com/subject/26739566/)
+  - 公众号：程序人生/天叔奇谈
+  - 知乎：[迷思](https://zhuanlan.zhihu.com/prattle)
+- 不成功的 up 主
+  - [喜欢历史的程序君](https://space.bilibili.com/39222989)
+- 马拉松入门选手
+  - 最好成绩：4h32m (2019 portland)
+
+---
+
 ## Elixir 的美妙之处
 
 - 隔离（isolation）
