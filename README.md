@@ -6,6 +6,8 @@ This is my talk for Beijing elixir meetup 5/16. To run the slides, you need to h
 make
 ```
 
+Or you could directly visit it from github: [slides/elixir-meet-rust.md](slides/elixir-meet-rust.md).
+
 ## Demo 1: rmark
 
 Markdown parser using [rustler](https://github.com/rusterlium/rustler) and [comrak](https://github.com/kivikakk/comrak). Compared with [earmark](https://github.com/pragdave/earmark), it is 20x-30x faster. This is a demo project to show how to use rustler to boost elixir/erlang projects.
