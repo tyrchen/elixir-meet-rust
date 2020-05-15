@@ -117,12 +117,15 @@ defmodule Jaxon.Parsers.NifParser do
 - 零成本抽象
 - 语言表达力很强
 - 强大的让人爱不释手的类型系统
+- 生态比 elixir 大很多，且有很多高性能数据结构和算法的实现
 
 ---
 
 ### Rustler：为 elixir/rust 建起一座桥
 
-- 安全：你撰写的 safe rust 不会 crash VM
+- 安全：
+  - 你撰写的 safe rust 不会 crash VM
+  - 内存安全和并发安全
 - 互操作：数据在两种语言之间可以很方便地传递
   - Rust struct <-> elixir term
 - 高效：数据可以按引用传递；当不再引用时自动销毁
@@ -259,7 +262,7 @@ fn to_html<'a>(env: Env<'a>, args: &[Term<'a>]) -> Result<Term<'a>, Error> {
 
 ## 解决方案
 
-- 对输入数据进行切片
+- 对输入数据进行切片（WTF）
 - ~~在 NIF 中允许被调度~~（rustler 尚无完整支持）
 - 使用 rust thread（异步处理）
 - Dirty Scheduler（> OTP 20，无痛方案）
@@ -270,24 +273,20 @@ fn to_html<'a>(env: Env<'a>, args: &[Term<'a>]) -> Result<Term<'a>, Error> {
 ## Rust thread
 
 ```rust
+// rust
 fn to_html_spawn<'a>(env: Env<'a>, args: &[Term<'a>]) -> Result<Term<'a>, Error> {
     let md: String = args[0].decode()?;
     use rustler::thread;
     thread::spawn::<thread::ThreadSpawner, _>(env, move |env| {
-        (
-            atoms::ok(),
-            markdown_to_html(&md, &ComrakOptions::default()),
-        )
-            .encode(env)
+        let result = markdown_to_html(&md, &ComrakOptions::default());
+        (atoms::ok(), result).encode(env)
     });
     Ok(atoms::ok().encode(env))
 }
-```
 
-```elixir
+// elixir
 def to_html2(md) do
   :ok = to_html_spawn(md)
-
   receive do
     {:ok, result} -> {:ok, result}
     {:error, error} -> {:error, error}
@@ -384,9 +383,64 @@ earmark          0.0806 K - 29.61x slower +11989.98 μs
 
 ---
 
-## 我们没有讲什么？
+## 进阶
 
+- 更优雅的 rustler 0.22.0-rc.0
+- 使用 env
 - ResourceObject
+
+
+---
+
+## rustler 0.22：更加 rusty
+
+---
+<!-- _backgroundColor: #ffffed -->
+
+## 旧代码：native/src/lib.rs
+
+```rust
+use rustler::{Encoder, Env, Error, Term};
+use comrak::{markdown_to_html, ComrakOptions};
+
+mod atoms {
+    rustler::rustler_atoms! {
+        atom ok;
+        //atom error;
+        //atom __true__ = "true";
+        //atom __false__ = "false";
+    }
+}
+
+rustler::rustler_export_nifs! {
+    "Elixir.Rmark", [
+        ("to_html", 1, to_html)
+    ],
+    None
+}
+
+fn to_html<'a>(env: Env<'a>, args: &[Term<'a>]) -> Result<Term<'a>, Error> {
+    let md: String = args[0].decode()?;
+    Ok((atoms::ok(), markdown_to_html(&md, &ComrakOptions::default())).encode(env))
+}
+```
+
+---
+
+<!-- _backgroundColor: #ffffed -->
+
+## 新代码：native/src/lib.rs
+
+```rust
+use comrak::{markdown_to_html, ComrakOptions};
+
+#[rustler::nif]
+fn to_html(md: String) -> String {
+    markdown_to_html(&md, &ComrakOptions::default())
+}
+
+rustler::init!("Elixir.Rmark", [to_html]);
+```
 
 ---
 
@@ -394,6 +448,53 @@ earmark          0.0806 K - 29.61x slower +11989.98 μs
 <!-- _color: #fff -->
 
 ## Live coding
+
+让 elixir 支持 [BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html)
+
+---
+
+```elixir
+iex(1)> m = Rbtree.new()
+#Reference<0.3262434626.2540568582.136961>
+iex(2)> Rbtree.get(m, "hello")
+{:error, :not_found}
+iex(3)> Rbtree.put(m, "hello", "world")
+:ok
+iex(4)> Rbtree.put(m, "goodbye", "world")
+:ok
+iex(5)> Rbtree.put(m, "greeting", "world")
+:ok
+iex(6)> Rbtree.get(m, "hello")
+{:ok, "world"}
+iex(7)> Rbtree.put(m, "hello", "world1")
+:ok
+iex(8)> Rbtree.get(m, "hello")
+{:ok, "world1"}
+iex(9)> Rbtree.to_list(m)
+{:ok, [{"goodbye", "world"}, {"greeting", "world"}, {"hello", "world1"}]}
+iex(10)> Rbtree.delete(m, "greeting")
+:ok
+iex(11)> Rbtree.to_list(m)
+{:ok, [{"goodbye", "world"}, {"hello", "world1"}]}
+iex(12)> Rbtree.crash_me_please(m)
+** (ErlangError) Erlang error: :nif_panicked
+    (rbtree 0.1.0) Rbtree.crash_me_please(#Reference<0.3262434626.2540568582.136961>)
+iex(12)> Rbtree.to_list(m)
+{:ok, [{"goodbye", "world"}, {"hello", "world1"}]}
+iex(6)> ref = make_ref()
+#Reference<0.1411875086.4143185933.220281>
+iex(8)> Rbtree.get(ref, "hello")
+** (ArgumentError) argument error
+    (rbtree 0.1.0) Rbtree.get(#Reference<0.1411875086.4143185933.220281>, "hello")
+```
+
+---
+
+## 我不会 rust，怎么办？
+
+---
+
+## Homework
 
 让 elixir 支持 [Roaring Bitmap](https://github.com/Nemo157/roaring-rs)
 

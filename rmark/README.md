@@ -1,6 +1,6 @@
 # Rmark
 
-Markdown parser using [rustler](https://github.com/rusterlium/rustler) and [comrak](https://github.com/kivikakk/comrak). Compared with [earmark](https://github.com/pragdave/earmark), it is 2x faster. This is a demo project to show how to use rustler to boost elixir/erlang projects.
+Markdown parser using [rustler](https://github.com/rusterlium/rustler) and [comrak](https://github.com/kivikakk/comrak). Compared with [earmark](https://github.com/pragdave/earmark), it is 20x-30x faster. This is a demo project to show how to use rustler to boost elixir/erlang projects.
 
 ## Benchmark result
 

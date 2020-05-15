@@ -1,12 +1,11 @@
-defmodule Rmark.MixProject do
+defmodule Rbtree.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :rmark,
+      app: :rbtree,
       version: "0.1.0",
       elixir: "~> 1.10",
-      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       compilers: [:rustler] ++ Mix.compilers(),
       rustler_crates: rustler_crates(),
@@ -24,7 +23,7 @@ defmodule Rmark.MixProject do
   defp rustler_crates do
     [
       rmark: [
-        path: "native/rmark",
+        path: "native/rbtree",
         mode: rustc_mode(Mix.env())
       ]
     ]
@@ -36,9 +35,7 @@ defmodule Rmark.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:rustler, "~> 0.21.0"},
-      {:benchee, "~> 1.0"},
-      {:earmark, "~> 1.4"}
+      {:rustler, "~> 0.22.0-rc.0"}
     ]
   end
 end
