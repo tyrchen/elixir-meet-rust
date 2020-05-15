@@ -106,7 +106,7 @@ fn delete(arc: ResourceArc<BTreeResource>, key: String) -> UpdateResult {
     }
 }
 
-#[rustler::nif]
+#[rustler::nif(schedule = "DirtyCpu")]
 fn to_list(arc: ResourceArc<BTreeResource>) -> IterResult {
     match arc.0.read() {
         Ok(m) => {

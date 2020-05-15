@@ -7,7 +7,7 @@ Markdown parser using [rustler](https://github.com/rusterlium/rustler) and [comr
 Don't forget to benchmark again
 
 ```bash
-➜ mix run benchmark/markdown.exs
+➜ MIX_ENV=prod mix run benchmark/markdown.exs
 Compiling NIF crate :rmark (native/rmark)...
     Finished release [optimized] target(s) in 0.03s
 Operating System: macOS

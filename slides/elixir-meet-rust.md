@@ -322,7 +322,7 @@ rustler::rustler_export_nifs! {
 ## Benchmark
 
 ```bash
-➜ mix run benchmark/markdown.exs
+➜ MIX_ENV=prod mix run benchmark/markdown.exs
 Compiling NIF crate :rmark (native/rmark)...
     Finished dev [unoptimized + debuginfo] target(s) in 2.05s
 Operating System: macOS
@@ -348,15 +348,16 @@ earmark             78.80 - 2.20x slower +6.92 ms
 ```
 
 ---
+![bg left contain](assets/zb.jpg)
 
-## 看上去不怎么样嘛？我辛辛苦苦写 rust，就快了一倍？？？
+#### 看上去不怎么样嘛？我辛辛苦苦写 rust，你就给我快一倍？？？
 
 ---
 <!-- _backgroundColor: #ffffed -->
 ## Benchmark with prod
 
 ```bash
-➜ mix run benchmark/markdown.exs
+➜ MIX_ENV=prod mix run benchmark/markdown.exs
 Compiling NIF crate :rmark (native/rmark)...
     Finished release [optimized] target(s) in 0.03s
 Operating System: macOS
@@ -452,6 +453,7 @@ rustler::init!("Elixir.Rmark", [to_html]);
 让 elixir 支持 [BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html)
 
 ---
+<!-- _backgroundColor: #ffffed -->
 
 ```elixir
 iex(1)> m = Rbtree.new()
@@ -490,6 +492,17 @@ iex(8)> Rbtree.get(ref, "hello")
 
 ---
 
+## 我们又学到了什么？
+
+- ResourceArc：如何在 rust 和 elixir 间共享数据
+- Env / Encoder：如何序列化你自己的数据结构
+- rust 代码 crash 真的不会 crash VM
+
+---
+<!-- _backgroundColor: white -->
+
+![bg right fit](assets/xuexi.jpg)
+
 ## 我不会 rust，怎么办？
 
 ---
@@ -497,6 +510,15 @@ iex(8)> Rbtree.get(ref, "hello")
 ## Homework
 
 让 elixir 支持 [Roaring Bitmap](https://github.com/Nemo157/roaring-rs)
+
+---
+
+## Reference
+
+- [learning rust](https://www.rust-lang.org/learn)
+- [rustler](https://github.com/rusterlium/rustler)
+  - [erlang nif sys](https://github.com/rusterlium/erlang_nif-sys)
+- [xqlite](https://github.com/dimitarvp/xqlite)
 
 ---
 
