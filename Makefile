@@ -19,6 +19,3 @@ copy-assets:
 
 $(TARGET_DIR):
 	@mkdir -p $@
-
-create-week:
-	@mkdir -p SRC_DIR/$(shell date +%Y)/w$(shell date +%V)/assets

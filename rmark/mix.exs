@@ -6,9 +6,9 @@ defmodule Rmark.MixProject do
       app: :rmark,
       version: "0.1.0",
       elixir: "~> 1.10",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
-      compilers: [:rustler] ++ Mix.compilers,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      compilers: [:rustler] ++ Mix.compilers(),
       rustler_crates: rustler_crates(),
       deps: deps()
     ]
@@ -22,10 +22,12 @@ defmodule Rmark.MixProject do
   end
 
   defp rustler_crates do
-    [rmark: [
-      path: "native/rmark",
-      mode: rustc_mode(Mix.env)
-    ]]
+    [
+      rmark: [
+        path: "native/rmark",
+        mode: rustc_mode(Mix.env())
+      ]
+    ]
   end
 
   defp rustc_mode(:prod), do: :release

@@ -147,9 +147,9 @@ dart 还有另一种玩法，就是我们运行 flutter 在设备模拟器上运
 8. How to call a rust function from dart using ffi: https://itnext.io/how-to-call-a-rust-function-from-dart-using-ffi-f48f3ea3af2c
 """
 
-Benchee.run(
-  %{
-    "earmark" => fn -> Earmark.as_html(markdown_text) end,
-    "rmark" => fn -> Rmark.to_html(markdown_text) end
-  }
-)
+Benchee.run(%{
+  "earmark" => fn -> Earmark.as_html(markdown_text) end,
+  "rmark" => fn -> Rmark.to_html(markdown_text) end,
+  "rmark_spawn" => fn -> Rmark.to_html2(markdown_text) end,
+  "rmark_dirty" => fn -> Rmark.to_html3(markdown_text) end
+})

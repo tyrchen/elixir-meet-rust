@@ -4,10 +4,12 @@ Markdown parser using [rustler](https://github.com/rusterlium/rustler) and [comr
 
 ## Benchmark result
 
+Don't forget to benchmark again
+
 ```bash
-mix run benchmark/markdown.exs
+➜ mix run benchmark/markdown.exs
 Compiling NIF crate :rmark (native/rmark)...
-    Finished dev [unoptimized + debuginfo] target(s) in 0.03s
+    Finished release [optimized] target(s) in 0.03s
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
 Number of Available Cores: 16
@@ -21,18 +23,24 @@ time: 5 s
 memory time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 14 s
+Estimated total run time: 28 s
 
 Benchmarking earmark...
 Benchmarking rmark...
+Benchmarking rmark_dirty...
+Benchmarking rmark_spawn...
 
-Name              ips        average  deviation         median         99th %
-rmark          156.47        6.39 ms    ±10.59%        6.03 ms        8.77 ms
-earmark         83.18       12.02 ms     ±7.39%       11.87 ms       15.16 ms
+Name                  ips        average  deviation         median         99th %
+rmark              2.39 K      419.01 μs    ±11.72%         407 μs      662.14 μs
+rmark_dirty        2.10 K      476.58 μs    ±13.78%         464 μs         787 μs
+rmark_spawn        1.95 K      514.06 μs    ±14.77%         496 μs      883.74 μs
+earmark          0.0806 K    12408.99 μs     ±7.81%       12262 μs    15110.40 μs
 
 Comparison:
-rmark          156.47
-earmark         83.18 - 1.88x slower +5.63 ms
+rmark              2.39 K
+rmark_dirty        2.10 K - 1.14x slower +57.57 μs
+rmark_spawn        1.95 K - 1.23x slower +95.05 μs
+earmark          0.0806 K - 29.61x slower +11989.98 μs
 ```
 
 ## Installation
