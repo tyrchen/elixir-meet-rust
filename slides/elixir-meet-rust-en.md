@@ -543,7 +543,7 @@ Let elixir support [Roaring Bitmap](https://github.com/Nemo157/roaring-rs)
 - [xqlite](https://github.com/dimitarvp/xqlite)
 
 ---
-<!-- _color: white -->
-![bg](assets/yoda.jpg)
+<!-- _backgroundColor: black -->
+<!-- _color: lightgrey -->
 
-# May the __Rust__ be with you!
+# May the _Rust_ be with you!

@@ -559,8 +559,8 @@ iex(8)> Rbtree.get(ref, "hello")
 - [xqlite](https://github.com/dimitarvp/xqlite)
 
 ---
-<!-- _color: white -->
-![bg](assets/yoda.jpg)
+<!-- _backgroundColor: black -->
+<!-- _color: lightgrey -->
 
 # May the __Rust__ be with you!
 
