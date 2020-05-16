@@ -30,7 +30,7 @@ theme: uncover
 ## 关于我
 
 - 女儿奴
-- elixir, rust, flutter 爱好者
+- elixir, rust, flutter, blockchain 爱好者
 - 懒散的码字农：
   - [《途客圈创业记》](https://book.douban.com/subject/26739566/)
   - 公众号：程序人生/天叔奇谈
@@ -93,7 +93,7 @@ defmodule Jaxon.Parsers.NifParser do
   end
 ```
 
-代码来源：[nif_parser](https://github.com/boudra/jaxon/blob/master/lib/jaxon/parsers/nif_parser.ex) | [decoder_nif.c](https://github.com/boudra/jaxon/blob/master/c_src/decoder_nif.c)
+[nif 文档](http://erlang.org/doc/tutorial/nif.html) | [nif_parser.ex](https://github.com/boudra/jaxon/blob/master/lib/jaxon/parsers/nif_parser.ex) | [decoder_nif.c](https://github.com/boudra/jaxon/blob/master/c_src/decoder_nif.c)
 
 
 ---
@@ -129,6 +129,7 @@ defmodule Jaxon.Parsers.NifParser do
 - 互操作：数据在两种语言之间可以很方便地传递
   - Rust struct <-> elixir term
 - 高效：数据可以按引用传递；当不再引用时自动销毁
+  - ResourceArc
 
 ---
 
@@ -274,7 +275,7 @@ iex(1)> Rmark.to_html("# hello world!")
 
 ![bg left](assets/happy.webp)
 
-## 有什么问题？
+### 这代码有问题么？
 
 ---
 
@@ -347,7 +348,9 @@ rustler::rustler_export_nifs! {
 
 ![bg](assets/solved.webp)
 
-## problem solved!
+## Problem solved!
+
+###### NIF 不再阻塞 scheduler
 
 ---
 
@@ -420,9 +423,10 @@ earmark          0.0806 K - 29.61x slower +11989.98 μs
 
 ## 进阶
 
+- ResourceArc
 - 更优雅的 rustler 0.22.0-rc.0
-- 使用 env
-- ResourceObject
+- 使用 Env / Decoder
+
 
 
 ---
