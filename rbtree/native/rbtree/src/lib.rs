@@ -3,6 +3,7 @@ use rustler::{Encoder, Env, Term};
 use std::collections::BTreeMap;
 use std::sync::RwLock;
 
+// 6. add the atoms you want to return to elixir
 rustler::atoms! {
     ok,
     error,
@@ -10,8 +11,10 @@ rustler::atoms! {
     internal
 }
 
+// 1. define the struct for ResourceArc (for simplicity, here the k & v we both use String)
 struct BTreeResource(RwLock<BTreeMap<String, String>>);
 
+// 5. define the data structure for returning to elixir, and its Encoder
 enum UpdateResult {
     Ok,
     InternalError,
@@ -55,11 +58,12 @@ impl<'a> Encoder for IterResult {
     }
 }
 
+// 4. start writing your features
 #[rustler::nif]
 fn new() -> ResourceArc<BTreeResource> {
     let tree: BTreeMap<String, String> = BTreeMap::new();
-    let mutex = RwLock::new(tree);
-    ResourceArc::new(BTreeResource(mutex))
+    let lock = RwLock::new(tree);
+    ResourceArc::new(BTreeResource(lock))
 }
 
 #[rustler::nif]
@@ -106,6 +110,7 @@ fn delete(arc: ResourceArc<BTreeResource>, key: String) -> UpdateResult {
     }
 }
 
+// NOTE: if the data could be very big, use "DirtyCpu" / "DirtyIo"
 #[rustler::nif(schedule = "DirtyCpu")]
 fn to_list(arc: ResourceArc<BTreeResource>) -> IterResult {
     match arc.0.read() {
@@ -125,11 +130,13 @@ fn crash_me_please(_arc: ResourceArc<BTreeResource>) {
     panic!("goodbye world!");
 }
 
+// 2. define the on_load callback
 fn on_load(env: Env, _info: Term) -> bool {
     rustler::resource!(BTreeResource, env);
     true
 }
 
+// 3. register the on_load callback
 rustler::init!(
     "Elixir.Rbtree",
     [new, put, get, has_key, delete, to_list, crash_me_please],
