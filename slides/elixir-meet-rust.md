@@ -93,7 +93,7 @@ defmodule Jaxon.Parsers.NifParser do
   end
 ```
 
-[nif 文档](http://erlang.org/doc/tutorial/nif.html) | [nif_parser.ex](https://github.com/boudra/jaxon/blob/master/lib/jaxon/parsers/nif_parser.ex) | [decoder_nif.c](https://github.com/boudra/jaxon/blob/master/c_src/decoder_nif.c)
+###### [nif 文档](http://erlang.org/doc/tutorial/nif.html) | [nif_parser.ex](https://github.com/boudra/jaxon/blob/master/lib/jaxon/parsers/nif_parser.ex) | [decoder_nif.c](https://github.com/boudra/jaxon/blob/master/c_src/decoder_nif.c)
 
 
 ---
@@ -565,3 +565,68 @@ iex(8)> Rbtree.get(ref, "hello")
 # May the __Rust__ be with you!
 
 ###### 本次讲座的 slides 及代码可在 [tyrchen/elixir-meet-rust](https://github.com/tyrchen/elixir-meet-rust) 上找到
+
+###### 补充：Q&A 见后页
+
+---
+
+> ###### 1. 在 erlang vm 里面有办法 rust async 函数吗？
+
+###### 一般来说，async 跟 IO 有关，而 rustler 要解决的是计算密集型的问题。但既然提到这个问题，我做了一个小实验，代码见 [rhttp](./rhttp)。如你所见，nif 函数目前不能直接是 async（没有实现 future 接口），以后不好说（deno 支持 rust future <-> js promise 间的互换，elixir 没有类似 future/promise 的数据结构，但也许可以用 GenServer 或者 Task 模拟）。所以如果一个库是 async 实现，我们需要用 `rt.block_on` 强行等待将其执行完毕，当然这样就完全把异步当做同步来看待了。注意在跟 IO 相关的 NIF 里，推荐使用 DirtyIo，这样不阻塞 elixir process 的 IO。
+
+```rust
+#[rustler::nif(schedule = "DirtyIo")]
+fn get(url: String) -> String {
+    let mut rt = Runtime::new().unwrap();
+    let result = rt.block_on(async { http_get(&url).await });
+    result
+}
+```
+
+---
+
+> ###### 2. Erlang 用的是 Preemptive Scheduling 吧只是 NIF function 需要 be cooperative?
+
+###### erlang 的 VM 实现（C 代码）是 cooperative scheduling，展现给用户程序（erlang / elixir 代码）的是 preemptive scheduling。因为 NIF 运行在 VM 态，所以需要 cooperative，来确保其不会阻塞调度器。
+
+---
+
+> ###### 3. 返回的数据如果是 rust 数据的一个引用，怎么解决 lifetime 的问题？ 会不会出现 rust 把数据 drop 掉了， elixir 还想要使用这个数据？或者 rust 如何决定什么时候 drop 一个数据？
+
+###### ResourceArc 是对 rust Arc 的一个封装，目的就是解决 elixir 代码持有的引用计数的问题。rust 侧的内存是否回收，取决于引用计数是否为零。rust 的整个借用机制（以及之上的封装）保证了在没有 GC 情况下的内存安全。所以只要代码能够编译通过，就不会出现野指针的问题。而 rustler 巧妙地使用了 Arc，让 elixir 的 reference（`make_ref()`）持有 rust 的 Arc，这样，无论多线程环境下这个 ref 怎么折腾，比如 process A -> process B -> process C，当这个 ref 在 elixir 侧 GC 时（所有使用它的 process 都退出），rust 侧 Arc 引用计数归零导致其内存被回收，感兴趣的同学可以具体看 ResourceArc 的 Drop trait 的实现。
+
+---
+
+> ###### 4. Elixir是否可以和JVM生态联动？
+
+###### 可以。通过 ports。不建议使用 NIF，因为 NIF 需要把编译出来的动态链接库（*.so）在对应模块加载时，加载到当前 elixir 进程的上下文中。即便可以把 JVM 运行时编译成动态链接库，加载一个几百兆的库，使用其中很小一个功能，意义也不是很大。
+
+---
+
+> ###### 5. Elixir 通过 NIF（Rustler）调用的 overhead 是怎么样的，特别是 NIF 调用时的数据encode/decode 大概有多大开销。比如 Elixir 传个大的 binary 给 rust，rust 返回一个大的 map 回来。
+
+###### 因为在同一个进程空间里，开销主要在两个语言数据结构见的 encoding/decoding。这个相对来说非常小，就是单纯的内存操作（拷贝 + 转换），其执行效率的数量级和 elixir 中传递消息应该差不多。对于潜在的对大量数据的密集操作，比如我 demo 2 中的 BtreeMap，来回传值没有意义，应该通过引用来访问。
+
+---
+> ###### 6. 这个白板工具是啥？这个Keynote 工具又是啥？
+
+###### 白板是 ipad 通过数据线连接到 mac，然后再通过 quicktime 显示到 mac 桌面，这样可以使用 pencil 方便绘图。ipad 里面绘图的工具是 Notability。Keynote 工具是 [marp](https://marp.app/)。
+
+---
+
+> ###### 7. 我对 elixir 不熟，为什么 immutable 的语言还会需要 makeref？这个得到的 ref 是可变的？
+
+###### ref 是一个唯一引用，可以通过 [make_ref](http://erlang.org/documentation/doc-5.7.4/erts-5.7.4/doc/html/erlang.html#make_ref-0) 生成，它跟是否 mutable 无关。在 Rustler 里，ref 被用作标识 rust 侧共享给 elixir 侧的资源。在 erlang/elixir 中，ref 一般被用作某个数据的唯一标识，比如在 GenServer 的实现里，我发出去的一条消息，需要得到对应的响应（GenServer.call），这时，你可以在发消息的时候同时提供一个 ref（使用了 ref 的相对唯一性），如下：
+
+```erlang
+Tag = make_ref(),
+Pid ! {Tag, Message},
+receive
+    {Tag, Response} ->
+        ....
+```
+
+---
+> ###### 8. Elixir 和 Python 的联动用什么比较推荐？
+
+###### NIF 肯定不合适 —— 纯 python 代码的执行效率和 elixir 在一个数量级（甚至更低）。ports 和 service（比如 gRPC）更合适。比如 python 有很好的使用 C 封装的图像处理的库，那么可以用 python 做一个服务，在 elixir 中调用。

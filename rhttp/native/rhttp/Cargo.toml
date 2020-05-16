@@ -1,0 +1,15 @@
+[package]
+name = "rhttp"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[lib]
+name = "rhttp"
+path = "src/lib.rs"
+crate-type = ["dylib"]
+
+[dependencies]
+rustler = "0.22.0-rc.0"
+reqwest = { version = "0.10", features = ["json"] }
+tokio = { version = "0.2", features = ["full"] }

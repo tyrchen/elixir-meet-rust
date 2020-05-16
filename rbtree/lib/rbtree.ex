@@ -3,7 +3,7 @@ defmodule Rbtree do
   Documentation for `Rbtree`.
   """
 
-  use Rustler, otp_app: :rbtree, create: :rbtree
+  use Rustler, otp_app: :rbtree, crate: :rbtree
   def new, do: err()
   def put(_btree, _key, _value), do: err()
   def get(_btree, _key), do: err()
