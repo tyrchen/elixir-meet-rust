@@ -470,7 +470,7 @@ rustler::init!("Elixir.Rmark", [to_html]);
 <!-- _backgroundColor: #222831 -->
 <!-- _color: #fff -->
 
-## Live coding
+## Deep Dive
 
 Let elixir support [BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html)
 
@@ -529,9 +529,9 @@ iex(8)> Rbtree.get(ref, "hello")
 
 ---
 
-## Homework
+## Live Coding
 
-Let elixir support [Roaring Bitmap](https://github.com/Nemo157/roaring-rs)
+Let elixir support [Sled DB](https://github.com/spacejam/sled)
 
 ---
 
