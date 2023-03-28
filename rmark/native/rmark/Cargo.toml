@@ -10,6 +10,6 @@ path = "src/lib.rs"
 crate-type = ["dylib"]
 
 [dependencies]
-comrak = "0.7"
+comrak = "0.17"
 lazy_static = "1.4"
 rustler = "0.21.0"
